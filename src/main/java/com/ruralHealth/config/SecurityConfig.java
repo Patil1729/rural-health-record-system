@@ -22,10 +22,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -132,12 +130,13 @@ public class SecurityConfig {
     // This method defines a bean for the UserDetailsService, which is responsible for loading user-specific data during the authentication process.
     // In this case, it uses JdbcUserDetailsManager, which retrieves user details from a database using the provided DataSource,
     // allowing for authentication and authorization based on user information stored in the database.
+//    @Bean
+ //   public UserDetailsService userDetailsService() {
+ //       return new JdbcUserDetailsManager(dataSource);
+ //   }
+
+
     @Bean
-    public UserDetailsService userDetailsService() {
-        return new JdbcUserDetailsManager(dataSource);
-    }
-
-
     public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository,
                                       PasswordEncoder passwordEncoder) {
         return args -> {
