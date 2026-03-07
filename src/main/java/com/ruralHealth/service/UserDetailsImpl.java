@@ -17,7 +17,10 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L; // for serialization, not mandatory but good practice.
+    // UserDetailsImpl is a class that implements the UserDetails interface from Spring Security.
+    // It serves as a custom implementation of the UserDetails interface,
+    // which is used to represent user information in the context of authentication and authorization.
     private Long id;
     private String username;
 
