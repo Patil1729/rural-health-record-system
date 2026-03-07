@@ -1,6 +1,9 @@
 package com.ruralHealth.entity;
 
 public enum Role {
-    ROLE_ADMIN,
-    ROLE_USER
+    ADMIN,
+    USER,
+    DOCTOR,
+    NURSE,
+    PATIENT
 }

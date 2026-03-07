@@ -14,8 +14,8 @@ public class Roles {
     @Column(name = "roleId")
     private Long roleId;
 
-    @ToString.Exclude
-    @Enumerated(EnumType.STRING)
+    @ToString.Exclude // To avoid circular reference when printing the object
+    @Enumerated(EnumType.STRING) // Store the enum as a string in the database
     @Column(name = "roleName")
     private Role roleName;
 
