@@ -40,7 +40,7 @@ public class User {
     @Column(name = "email")
     private String email;
 
-    public User(String userName, String email , String password ) {
+    public User(String userName, String email, String password) {
         this.userName = userName;
         this.password = password;
         this.email = email;
@@ -48,8 +48,8 @@ public class User {
 
     @Getter
     @Setter
-    @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER)
-    @JoinTable(
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinTable( //
             name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "roleId")
@@ -57,13 +57,6 @@ public class User {
     private Set<Roles> roles;
 
 
-//    @ToString.Exclude
-//    @OneToMany(mappedBy = "user",
-//            cascade = {CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.EAGER,
-//            orphanRemoval = true
-//    )
-//    private Set<Product> products;
-//
 //
 //    @Getter
 //    @Setter
@@ -75,9 +68,5 @@ public class User {
 ////    )
 //    private List< Address> address = new ArrayList<>();
 //
-//
-//    @ToString.Exclude // to exclude from to string
-//    @OneToOne(mappedBy = "user",cascade =
-//            {CascadeType.PERSIST, CascadeType.MERGE,CascadeType.REMOVE},orphanRemoval = true)
-//    private Cart cart;
+
 }

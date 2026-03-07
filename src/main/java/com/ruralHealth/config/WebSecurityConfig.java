@@ -4,9 +4,7 @@ package com.ruralHealth.config;
 import com.ruralHealth.entity.Role;
 import com.ruralHealth.entity.Roles;
 import com.ruralHealth.entity.User;
-import com.ruralHealth.jwtUtility.AuthJWTTokenFilter;
-import com.ruralHealth.jwtUtility.JWTAuthenticationEntryPoint;
-import com.ruralHealth.repository.RoleRepository;
+import com.ruralHealth.repository.RolesRepository;
 import com.ruralHealth.repository.UserRepository;
 import com.ruralHealth.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,7 @@ import java.util.Set;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class SecurityConfig {
+public class WebSecurityConfig {
 
     // Injecting the DataSource bean, which is typically used for database connectivity in Spring applications,
     // allowing the application to interact with the database for authentication and authorization purposes.
@@ -54,6 +52,8 @@ public class SecurityConfig {
     UserDetailsServiceImpl userDetailsService;
 
 
+    // This method defines a bean for the DaoAuthenticationProvider,
+    // which is responsible for authenticating users based on data retrieved from a UserDetailsService and encoded passwords.
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -86,8 +86,8 @@ public class SecurityConfig {
         // which is often necessary for stateless applications or APIs that do not use cookies for authentication.
         http.csrf(csrf->csrf.disable());
 
-        /// Configuring exception handling to use a custom authentication entry point (AuthEntryPointJwt) for handling unauthorized access attempts,
-        /// which is typically used in applications that implement JWT-based authentication to provide
+        // Configuring exception handling to use a custom authentication entry point (AuthEntryPointJwt) for handling unauthorized access attempts,
+        // which is typically used in applications that implement JWT-based authentication to provide
         //a consistent response when an unauthenticated user tries to access a protected resource.
         http.exceptionHandling(
                 exception -> exception
@@ -112,14 +112,20 @@ public class SecurityConfig {
                 ).authenticated()
         );
 
-        /// Configuring HTTP headers to allow the application to be embedded in an iframe from the same origin,
-        /// which is often necessary for applications that need to be displayed within other web pages or applications.
+        // Configuring HTTP headers to allow the application to be embedded in an iframe from the same origin,
+        // which is often necessary for applications that need to be displayed within other web pages or applications.
         http.headers(
                 headers-> headers
                         .frameOptions(frameOptions ->frameOptions.sameOrigin() )
         );
 
-// Adding a custom authentication filter (AuthTokenFilter) before the default UsernamePasswordAuthenticationFilter in the security filter chain,
+
+        // Adding the custom authentication provider (DaoAuthenticationProvider) to the security configuration,
+        // which allows the application to authenticate users based on the data retrieved
+        // from the UserDetailsService and the password encoding mechanism defined in the authentication provider.
+        http.authenticationProvider(authenticationProvider());
+
+        // Adding a custom authentication filter (AuthTokenFilter) before the default UsernamePasswordAuthenticationFilter in the security filter chain,
         // which is necessary for processing JWT tokens and authenticating users based on the token's validity before the standard authentication process takes place.
         http.addFilterBefore(
                 authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -127,44 +133,75 @@ public class SecurityConfig {
         return (SecurityFilterChain) http.build();
     }
 
-    // This method defines a bean for the UserDetailsService, which is responsible for loading user-specific data during the authentication process.
-    // In this case, it uses JdbcUserDetailsManager, which retrieves user details from a database using the provided DataSource,
-    // allowing for authentication and authorization based on user information stored in the database.
-//    @Bean
- //   public UserDetailsService userDetailsService() {
- //       return new JdbcUserDetailsManager(dataSource);
- //   }
-
-
+    // This method is a CommandLineRunner that initializes the application with some default user data.
     @Bean
-    public CommandLineRunner initData(RoleRepository roleRepository, UserRepository userRepository,
+    public CommandLineRunner initData(RolesRepository roleRepository, UserRepository userRepository,
                                       PasswordEncoder passwordEncoder) {
         return args -> {
             // Retrieve or create roles
-            Roles userRole = roleRepository.findByRoleName(Role.ROLE_USER)
+            Roles userRole = roleRepository.findByRoleName(Role.USER)
                     .orElseGet(() -> {
-                        Roles newUserRole = new Roles(Role.ROLE_USER);
+                        Roles newUserRole = new Roles(Role.USER);
                         return roleRepository.save(newUserRole);
                     });
 
 
-            Roles adminRole = roleRepository.findByRoleName(Role.ROLE_ADMIN)
+            Roles adminRole = roleRepository.findByRoleName(Role.ADMIN)
                     .orElseGet(() -> {
-                        Roles newAdminRole = new Roles(Role.ROLE_ADMIN);
+                        Roles newAdminRole = new Roles(Role.ADMIN);
                         return roleRepository.save(newAdminRole);
+                    });
+/*
+            Roles doctorRole = roleRepository.findByRoleName(Role.DOCTOR)
+                    .orElseGet(() -> {
+                        Roles newDoctorRole = new Roles(Role.DOCTOR);
+                        return roleRepository.save(newDoctorRole);
+                    });
+
+            Roles patientRole = roleRepository.findByRoleName(Role.PATIENT)
+                    .orElseGet(() -> {
+                        Roles newPatientRole = new Roles(Role.PATIENT);
+                        return roleRepository.save(newPatientRole);
+                    });
+
+            Roles nurseRole = roleRepository.findByRoleName(Role.NURSE)
+                    .orElseGet(() -> {
+                        Roles newNurseRole = new Roles(Role.NURSE);
+                        return roleRepository.save(newNurseRole);
                     });
 
             Set<Roles> userRoles = Set.of(userRole);
-            Set<Roles> adminRoles = Set.of(userRole, adminRole);
+            Set<Roles> doctorRoles = Set.of(doctorRole);
+            Set<Roles> patientRoles = Set.of(patientRole);
+            Set<Roles> nurseRoles = Set.of(nurseRole);
+            Set<Roles> adminRoles = Set.of(userRole, adminRole, doctorRole, patientRole, nurseRole);
+*/
 
+            Set<Roles> userRoles = Set.of(userRole);
+            Set<Roles> adminRoles = Set.of(userRole, adminRole);
 
             // Create users if not already present
             if (!userRepository.existsByUserName("user")) {
                 com.ruralHealth.entity.User user = new User("user", "user@example.com", passwordEncoder.encode("user123"));
                 userRepository.save(user);
             }
+/*
+            if (!userRepository.existsByUserName("doctor")) {
+                com.ruralHealth.entity.User doctor = new User("doctor", "doctor@example.com", passwordEncoder.encode("doctor123"));
+                userRepository.save(doctor);
+            }
 
+            if (!userRepository.existsByUserName("patient")) {
+                com.ruralHealth.entity.User patient = new User("patient", "patient@example.com", passwordEncoder.encode("patient123"));
+                userRepository.save(patient);
+            }
 
+            if (!userRepository.existsByUserName("nurse")) {
+                com.ruralHealth.entity.User nurse = new User("nurse", "nurse@example.com", passwordEncoder.encode("nurse123"));
+                userRepository.save(nurse);
+            }
+
+*/
             if (!userRepository.existsByUserName("admin")) {
                 com.ruralHealth.entity.User admin = new User("admin", "admin@example.com", passwordEncoder.encode("admin123"));
                 userRepository.save(admin);
@@ -175,7 +212,22 @@ public class SecurityConfig {
                 user.setRoles(userRoles);
                 userRepository.save(user);
             });
+/*
+            userRepository.findByUserName("doctor").ifPresent(doctor -> {
+                doctor.setRoles(doctorRoles);
+                userRepository.save(doctor);
+            });
 
+            userRepository.findByUserName("patient").ifPresent(patient -> {
+                patient.setRoles(patientRoles);
+                userRepository.save(patient);
+            });
+
+            userRepository.findByUserName("nurse").ifPresent(nurse -> {
+                nurse.setRoles(nurseRoles);
+                userRepository.save(nurse);
+            });
+*/
 
             userRepository.findByUserName("admin").ifPresent(admin -> {
                 admin.setRoles(adminRoles);
@@ -212,9 +264,6 @@ public class SecurityConfig {
         };
     }
 */
-
-
-
 
 
 

@@ -1,5 +1,6 @@
-package com.ruralHealth.jwtUtility;
+package com.ruralHealth.config;
 
+import com.ruralHealth.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,7 +26,7 @@ public class AuthJWTTokenFilter extends OncePerRequestFilter {
     @Autowired
     private  JWTUtils jwtUtils;
     @Autowired
-    private UserDetailsService userDetailsService;
+    private UserDetailsServiceImpl userDetailsService;
 
     private static final Logger log = LoggerFactory.getLogger(AuthJWTTokenFilter.class);
 
@@ -59,7 +59,9 @@ public class AuthJWTTokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             log.error("Cannot set authentication : {}", e.getMessage());
         }
-// The filterChain.doFilter(request, response) method is called to pass the request and response to the next filter in the chain. This allows the request to continue through the filter chain and eventually reach the intended destination (e.g., a controller or resource). If the authentication was successful, the user will be able to access protected resources; otherwise,
+// The filterChain.doFilter(request, response) method is called to pass the request and response to the next filter in the chain.
+// This allows the request to continue through the filter chain and eventually reach the intended destination
+// (e.g., a controller or resource). If the authentication was successful, the user will be able to access protected resources; otherwise,
 // they will receive an appropriate response (e.g., 401 Unauthorized) from the authentication entry point.
            filterChain.doFilter(request,response);
 
@@ -67,7 +69,9 @@ public class AuthJWTTokenFilter extends OncePerRequestFilter {
 
 
     private String parseToken(HttpServletRequest request) {
-        String jwt = jwtUtils.getJWTFromHeader(request);
+        String jwt = jwtUtils.getJWTFromCookie(request);
+        //String jwt = jwtUtils.getJWTFromHeader(request);
+        log.debug("AuthJWTTokenFilter jwt : {}", jwt);
         if (jwt != null && jwtUtils.validateJWTToken(jwt)) {
             return jwt;
         }

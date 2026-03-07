@@ -1,10 +1,10 @@
 package com.ruralHealth.controller;
 
+import com.ruralHealth.config.JWTUtils;
 import com.ruralHealth.entity.Role;
 import com.ruralHealth.entity.Roles;
 import com.ruralHealth.entity.User;
-import com.ruralHealth.jwtUtility.JWTUtils;
-import com.ruralHealth.repository.RoleRepository;
+import com.ruralHealth.repository.RolesRepository;
 import com.ruralHealth.repository.UserRepository;
 import com.ruralHealth.request.LoginRequest;
 import com.ruralHealth.request.SignUpRequest;
@@ -15,7 +15,9 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthRestController {
     // This controller will handle authentication requests and generate JWT tokens for authenticated users.
 
@@ -50,7 +52,7 @@ public class AuthRestController {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private RolesRepository roleRepository;
 
     @GetMapping("/hello")
     public String sayHello() {
@@ -58,7 +60,7 @@ public class AuthRestController {
     }
 
 
-    @PostMapping("/auth/sign-in")
+    @PostMapping("/sign-in")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         // This method will handle user registration requests. It will likely accept user details (e.g., username, password, email) and
         // create a new user account in the system. After successful registration, it may return a response indicating that the user has been registered successfully.
@@ -80,20 +82,31 @@ public class AuthRestController {
         //to store authentication in security context
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        String jwtToken = jwtUtils.generateJWTTokenFromUserName(userDetails);
+
+        /// String jwtToken = jwtUtils.generateJWTTokenFromUserName(userDetails);
+
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+        log.debug("JWT cookie : {}", jwtCookie);
 
         List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(item -> item.getAuthority()).collect(Collectors.toList());
 
-        UserInfoResponse response = new UserInfoResponse(userDetails.getId(),jwtToken,roles,userDetails.getUsername());
-        return  ResponseEntity.ok(response);
+        ///UserInfoResponse response = new UserInfoResponse(userDetails.getId(),jwtToken,roles,userDetails.getUsername());
+        UserInfoResponse response = new  UserInfoResponse(userDetails.getId(),jwtCookie.toString(),roles,userDetails.getUsername());
 
-        //return ResponseEntity.ok("User registered successfully");
+        // to pass cookie to frontend we need to set cookie in header and send response body as well
+        return  ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(response);
+
+       /// return  ResponseEntity.ok(response);
+
+
     }
 
    // @PreAuthorize(value = "hasRole('ADMIN')")
-    @PostMapping("/auth/signup")
+    @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest request){
 
         if(userRepository.existsByUserName(request.getUsername())){
@@ -119,30 +132,48 @@ public class AuthRestController {
         Set<Roles> roles = new HashSet<>();
 
         if(strRole == null){
-            Roles userRole =roleRepository.findByRoleName(Role.ROLE_USER)
+            Roles userRole = roleRepository.findByRoleName(Role.USER)
                     .orElseThrow(()-> new RuntimeException("Error : Role not found"));
             roles.add(userRole);
         }else {
             strRole.forEach(role -> {
                 switch (role) {
                     case "admin":
-                        Roles adminRole =roleRepository.findByRoleName(Role.ROLE_ADMIN)
+                        Roles adminRole = roleRepository.findByRoleName(Role.ADMIN)
                                 .orElseThrow(()-> new RuntimeException("Error : Role not found"));
                         roles.add(adminRole);
                         break;
-//                    case "patient":
-//                        Roles sellerRole =roleRepository.findByRoleName(Role.ROLE_PATIENT)
-//                                .orElseThrow(()-> new RuntimeException("Error : Role not found"));
-//                        roles.add(patientRole);
-//                        break;
+
+                    case "doctor":
+                        Roles doctorRole = roleRepository.findByRoleName(Role.DOCTOR)
+                                .orElseThrow(()-> new RuntimeException("Error : Role not found"));
+                        roles.add(doctorRole);
+                        break;
+
+                    case "patient":
+                        Roles patientRole = roleRepository.findByRoleName(Role.PATIENT)
+                                .orElseThrow(()-> new RuntimeException("Error : Role not found"));
+                        roles.add(patientRole);
+                        break;
+
+                   case "nurse":
+                       Roles nurseRole = roleRepository.findByRoleName(Role.NURSE)
+                               .orElseGet(() -> {
+                                   Roles newRole = new Roles(Role.NURSE);
+                                   return roleRepository.save(newRole);
+                               });
+                       roles.add(nurseRole);
+                       break;
+
                     default:
-                        Roles userRole =roleRepository.findByRoleName(Role.ROLE_USER)
+                        Roles userRole = roleRepository.findByRoleName(Role.USER)
                                 .orElseThrow(()-> new RuntimeException("Error : Role not found"));
                         roles.add(userRole);
 
                 }
             });
         }
+
 
         user.setRoles(roles);
         userRepository.save(user);
@@ -152,7 +183,7 @@ public class AuthRestController {
 
     }
 
-    @GetMapping("/auth/username")
+    @GetMapping("/username")
     public String currentUsername( Authentication authentication){
         if(authentication !=null){
             return authentication.getName();
@@ -162,7 +193,7 @@ public class AuthRestController {
     }
 
 
-    @GetMapping("/auth/user")
+    @GetMapping("/user")
     public ResponseEntity<?> currentUserDetails(Authentication authentication){
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
@@ -178,14 +209,14 @@ public class AuthRestController {
     }
 
 
-//    @PostMapping("/signout")
-//    public ResponseEntity<?> signOutUser(){
-//        ResponseCookie jwtCookie = jwtUtils.getCleanJwtCookie();
-//
-//        return  ResponseEntity.ok()
-//                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-//                .body(new MessageResponse("You've been logged out successfully"));
-//    }
+    @PostMapping("/signout")
+    public ResponseEntity<?> signOutUser(){
+        ResponseCookie jwtCookie = jwtUtils.getCleanJwtCookie();
+
+        return  ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(new MessageResponse("You've been logged out successfully"));
+    }
 
 
 

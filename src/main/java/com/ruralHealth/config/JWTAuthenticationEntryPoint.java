@@ -1,4 +1,4 @@
-package com.ruralHealth.jwtUtility;
+package com.ruralHealth.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
