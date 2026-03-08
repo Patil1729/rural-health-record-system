@@ -1,4 +1,4 @@
-package com.ruralHealth.request;
+package com.ruralHealth.security.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

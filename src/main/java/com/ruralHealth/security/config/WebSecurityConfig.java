@@ -1,4 +1,4 @@
-package com.ruralHealth.config;
+package com.ruralHealth.security.config;
 
 
 import com.ruralHealth.entity.Role;
@@ -6,7 +6,7 @@ import com.ruralHealth.entity.Roles;
 import com.ruralHealth.entity.User;
 import com.ruralHealth.repository.RolesRepository;
 import com.ruralHealth.repository.UserRepository;
-import com.ruralHealth.service.UserDetailsServiceImpl;
+import com.ruralHealth.security.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -107,7 +107,7 @@ public class WebSecurityConfig {
                 (
                         (AuthorizeHttpRequestsConfigurer.AuthorizedUrl)requests
                                 .requestMatchers("/api/auth/**").permitAll()
-                                //.requestMatchers("/api/sign-in").permitAll()
+                                .requestMatchers("/api/patients/**").permitAll()
                                 .anyRequest()
                 ).authenticated()
         );

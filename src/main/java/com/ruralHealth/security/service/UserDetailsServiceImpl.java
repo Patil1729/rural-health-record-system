@@ -1,4 +1,4 @@
-package com.ruralHealth.service;
+package com.ruralHealth.security.service;
 
 import com.ruralHealth.entity.User;
 import com.ruralHealth.repository.UserRepository;
