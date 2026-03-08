@@ -1,4 +1,4 @@
-package com.ruralHealth.config;
+package com.ruralHealth.security.config;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;

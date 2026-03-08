@@ -1,16 +1,16 @@
-package com.ruralHealth.controller;
+package com.ruralHealth.security.controller;
 
-import com.ruralHealth.config.JWTUtils;
 import com.ruralHealth.entity.Role;
 import com.ruralHealth.entity.Roles;
 import com.ruralHealth.entity.User;
 import com.ruralHealth.repository.RolesRepository;
 import com.ruralHealth.repository.UserRepository;
-import com.ruralHealth.request.LoginRequest;
-import com.ruralHealth.request.SignUpRequest;
-import com.ruralHealth.response.MessageResponse;
-import com.ruralHealth.response.UserInfoResponse;
-import com.ruralHealth.service.UserDetailsImpl;
+import com.ruralHealth.security.config.JWTUtils;
+import com.ruralHealth.security.request.LoginRequest;
+import com.ruralHealth.security.request.SignUpRequest;
+import com.ruralHealth.security.response.MessageResponse;
+import com.ruralHealth.security.response.UserInfoResponse;
+import com.ruralHealth.security.service.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,6 @@
-package com.ruralHealth.config;
+package com.ruralHealth.security.config;
 
-import com.ruralHealth.service.UserDetailsServiceImpl;
+import com.ruralHealth.security.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

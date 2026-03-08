@@ -1,4 +1,4 @@
-package com.ruralHealth.request;
+package com.ruralHealth.security.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

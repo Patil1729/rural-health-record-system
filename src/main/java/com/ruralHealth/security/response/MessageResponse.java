@@ -1,4 +1,4 @@
-package com.ruralHealth.response;
+package com.ruralHealth.security.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
