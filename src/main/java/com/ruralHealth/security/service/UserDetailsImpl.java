@@ -1,4 +1,4 @@
-package com.ruralHealth.service;
+package com.ruralHealth.security.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ruralHealth.entity.User;

@@ -1,7 +1,7 @@
-package com.ruralHealth.config;
+package com.ruralHealth.security.config;
 
 
-import com.ruralHealth.service.UserDetailsImpl;
+import com.ruralHealth.security.service.UserDetailsImpl;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.io.Decoders;
