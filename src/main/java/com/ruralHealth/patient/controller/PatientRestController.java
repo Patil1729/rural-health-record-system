@@ -7,13 +7,12 @@ import com.ruralHealth.security.utils.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/patients")
+@RequestMapping("/api/patient")
 public class PatientRestController {
 
     @Autowired
@@ -29,5 +28,11 @@ public class PatientRestController {
         return new ResponseEntity<>(savedPatientDTO, HttpStatus.CREATED);
     }
 
+    @GetMapping("/allPatients")
+    public ResponseEntity< List<PatientDTORequest> > getAllPatients(){
+        User user = authUtil.loggedInUser();
+        List<PatientDTORequest> patientDTORequestList = patientService.getAllPatients();
+        return new ResponseEntity<>(patientDTORequestList,HttpStatus.OK);
+    }
 
 }
