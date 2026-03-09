@@ -107,7 +107,7 @@ public class WebSecurityConfig {
                 (
                         (AuthorizeHttpRequestsConfigurer.AuthorizedUrl)requests
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/patients/**").permitAll()
+                                .requestMatchers("/api/patient/**").permitAll()
                                 .anyRequest()
                 ).authenticated()
         );

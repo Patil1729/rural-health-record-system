@@ -9,6 +9,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PatientServiceImpl implements PatientService {
 
@@ -36,5 +39,31 @@ public class PatientServiceImpl implements PatientService {
         }
 
         return response;
+    }
+
+    @Override
+    public List<PatientDTORequest> getAllPatients() {
+        //check if patient list is empty or not
+        List< Patient > availablePatients = patientRepository.findAll();
+
+        if(availablePatients.isEmpty()){
+            throw new ApiException("No patient found in the system...");
+        }
+
+        List< PatientDTORequest > patientsDTOList = availablePatients.stream()
+                .map(patient -> modelMapper.map(patient, PatientDTORequest.class))
+                .collect(Collectors.toList());
+
+            availablePatients.forEach(patient -> {
+                User createdBy = patient.getCreatedBy();
+                if (createdBy != null) {
+                    String createdByUserName = createdBy.getUserName();
+                    patientsDTOList.stream()
+                            .filter(p -> p.getPatientId().equals(patient.getPatientId()))
+                            .findFirst()
+                            .ifPresent(p -> p.setCreatedBy(createdByUserName));
+                }
+            });
+        return patientsDTOList;
     }
 }
