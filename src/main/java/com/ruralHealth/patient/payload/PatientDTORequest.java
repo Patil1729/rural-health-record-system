@@ -18,8 +18,8 @@ public class PatientDTORequest {
     private Integer age;
     private String gender;
 
-    @NotBlank
-    private String phone;
+    @NotBlank(message = "Phone number is required")
+    private String phoneNumber;
 
     @Email
     private String email;

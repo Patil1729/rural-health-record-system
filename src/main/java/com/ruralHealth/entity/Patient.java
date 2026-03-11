@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @Table(name = "patient", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "phone"),
+        @UniqueConstraint(columnNames = "phoneNumber"),
         @UniqueConstraint(columnNames = "email")
 })
 @AllArgsConstructor
@@ -28,7 +28,7 @@ public class Patient {
     private String gender;
 
     @NotBlank
-    private String phone;
+    private String phoneNumber;
 
     @Email
     private String email;
