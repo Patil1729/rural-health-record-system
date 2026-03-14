@@ -2,6 +2,7 @@ package com.ruralHealth.repository;
 
 import com.ruralHealth.entity.Patient;
 import com.ruralHealth.entity.User;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +15,7 @@ public interface PatientRepository extends JpaRepository<Patient,Long> {
 
     Patient findByName(String name);
 
-    Optional< Patient> findByPhoneNumber(String phoneNumber);
+    Optional< Patient> findByPhoneNumber(@NotBlank String phoneNumber);
 
     List<Patient> findByNameLikeIgnoreCase(String name);
 
