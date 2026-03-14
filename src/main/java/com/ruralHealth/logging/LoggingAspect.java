@@ -13,7 +13,7 @@ public class LoggingAspect {
 
     private static final Logger log = LoggerFactory.getLogger(LoggingAspect.class);
 
-
+    //@Around("@within(org.springframework.web.bind.annotation.RestController)")
     @Around("execution(* com.ruralHealth..controller..*(..))")
     public Object logController(ProceedingJoinPoint joinPoint) throws Throwable {
         String methodName = joinPoint.getSignature().toShortString();
