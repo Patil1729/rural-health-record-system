@@ -42,11 +42,11 @@ public class PatientServiceImpl implements PatientService {
     public PatientDTORequest savePatient(PatientDTORequest patientDTORequest, User user) {
 
         Patient patientToSave = modelMapper.map(patientDTORequest, Patient.class);
-        Patient savedPatient = patientRepository.findByName(patientToSave.getName());
+         patientRepository.findByPhoneNumber(patientToSave.getPhoneNumber())
+                 .ifPresent(patient ->{
+                     throw new ApiException("Patient with phone number "+patientToSave.getPhoneNumber()+" already exists in the system...");
+                 });
 
-        if(savedPatient!=null){
-            throw new ApiException("Patient with name "+patientToSave.getName()+" already exists");
-        }
         patientToSave.setCreatedBy(user);
         Patient savedPatientInDB = patientRepository.save(patientToSave);
 
