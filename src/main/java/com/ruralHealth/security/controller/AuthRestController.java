@@ -9,6 +9,7 @@ import com.ruralHealth.security.config.JWTUtils;
 import com.ruralHealth.security.request.LoginRequest;
 import com.ruralHealth.security.request.SignUpRequest;
 import com.ruralHealth.security.response.MessageResponse;
+import com.ruralHealth.security.response.UserDTO;
 import com.ruralHealth.security.response.UserInfoResponse;
 import com.ruralHealth.security.service.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
+@CrossOrigin
 @RestController
 @RequestMapping("/api/auth")
 public class AuthRestController {
@@ -207,6 +208,25 @@ public class AuthRestController {
                 .body(response);
 
     }
+
+
+    @GetMapping("/allusers")
+    public ResponseEntity<?> getAllUsers() {
+
+        List<UserDTO> users = userRepository.findAll()
+                .stream()
+                .map(user -> new UserDTO(
+                        user.getUserId(),
+                        user.getUserName(),
+                        user.getEmail(),
+                        user.getRoles().stream()
+                                .map(role -> role.getRoleName().toString())
+                                .collect(Collectors.toSet())
+                ))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(users);
+    }
+
 
 
     @PostMapping("/signout")
