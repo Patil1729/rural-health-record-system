@@ -11,6 +11,7 @@ import com.ruralHealth.repository.DoctorRepository;
 import com.ruralHealth.repository.MedicalHistoryRepository;
 import com.ruralHealth.repository.PatientRepository;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Service
-public class MedicalHistoryIMPL implements MedicalHistoryService {
+public class MedicalHistoryServiceImpl implements MedicalHistoryService {
     @Autowired
     private ModelMapper modelMapper;
     @Autowired
@@ -33,18 +34,25 @@ public class MedicalHistoryIMPL implements MedicalHistoryService {
 
     @Override
     public MedicalHistoryDTO createMedicalHistory(MedicalHistoryDTO medicalHistoryDTO) {
+
+        modelMapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.STRICT);
+
+        modelMapper.typeMap(MedicalHistoryDTO.class, MedicalHistory.class)
+                .addMappings(mapper -> mapper.skip(MedicalHistory::setHistoryId));
+
         MedicalHistory medicalHistory = modelMapper.map(medicalHistoryDTO, MedicalHistory.class);
 
         Patient patient = patientRepository.findById(medicalHistoryDTO.getPatientId())
-                .orElseThrow(() -> new RuntimeException("Patient not found with id: " + medicalHistoryDTO.getPatientId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", medicalHistoryDTO.getPatientId()));
         medicalHistory.setPatient(patient);
 
         Doctor doctor = doctorRepository.findById(medicalHistoryDTO.getDoctorId())
-                .orElseThrow(() -> new RuntimeException("Doctor not found with id: " + medicalHistoryDTO.getDoctorId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor", "id", medicalHistoryDTO.getDoctorId()));
         medicalHistory.setDoctor(doctor);
 
         Appointment appointment = appointmentRepository.findById(medicalHistoryDTO.getAppointmentId())
-                .orElseThrow(() -> new RuntimeException("Appointment not found with id: " + medicalHistoryDTO.getAppointmentId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment", "id", medicalHistoryDTO.getAppointmentId()));
         medicalHistory.setAppointment(appointment);
 
         MedicalHistory savedMedicalHistory = medicalHistoryRepository.save(medicalHistory);
@@ -56,7 +64,7 @@ public class MedicalHistoryIMPL implements MedicalHistoryService {
     public MedicalHistoryDTO getMedicalHistoryById(Long id) {
 
         MedicalHistory medicalHistory = medicalHistoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Medical history not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("MedicalHistory", "id", id));
         return modelMapper.map(medicalHistory, MedicalHistoryDTO.class);
 
     }
@@ -65,7 +73,7 @@ public class MedicalHistoryIMPL implements MedicalHistoryService {
     public List<MedicalHistoryDTO> getMedicalHistoryByPatientId(Long patientId) {
 
         Patient patient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new RuntimeException("Patient not found with id: " + patientId));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient", "id", patientId));
 
         List<MedicalHistory> medicalHistoryList = medicalHistoryRepository.findByPatient(patient);
 
