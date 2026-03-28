@@ -116,4 +116,14 @@ public class MedicalHistoryServiceImpl implements MedicalHistoryService {
                 }).toList();
     }
 
+
+    public MedicalHistoryDTO mapToDTO(MedicalHistory medicalHistory) {
+        return modelMapper.map(medicalHistory, MedicalHistoryDTO.class);
+    }
+
+    public List<MedicalHistoryDTO> mapToDTOList(List<MedicalHistory> medicalHistories) {
+        return medicalHistories.stream().map(this::mapToDTO).toList();
+    }
+
+
 }
