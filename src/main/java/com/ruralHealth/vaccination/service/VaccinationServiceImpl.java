@@ -134,5 +134,12 @@ public class VaccinationServiceImpl implements VaccinationService {
     }
 
 
+    public VaccinationDTO mapToDTO(Vaccination vaccination) {
+        return modelMapper.map(vaccination, VaccinationDTO.class);
+    }
+
+    public List<VaccinationDTO> mapToDTOList(List<Vaccination> vaccinations) {
+        return vaccinations.stream().map(this::mapToDTO).toList();
+    }
 
 }
