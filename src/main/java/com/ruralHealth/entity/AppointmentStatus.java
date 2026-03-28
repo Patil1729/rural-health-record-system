@@ -6,7 +6,7 @@ public enum AppointmentStatus {
     BOOKED,
     COMPLETED,
     CANCELLED,
-    CONFIRMED,;
+    CONFIRMED;
 
     @JsonCreator
     public static Specialization fromValue(String value) {
