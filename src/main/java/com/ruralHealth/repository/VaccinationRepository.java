@@ -17,4 +17,6 @@ public interface VaccinationRepository  extends JpaRepository<Vaccination,Long> 
     List<Vaccination> findByPatient_PatientId(Long patientId);
 
     List<Vaccination> findByNextDueDate(LocalDate tomorrow);
+
+    List<Vaccination> findByPatient_PatientIdAndNextDueDateBefore(Long patientId, LocalDate localDate);
 }
