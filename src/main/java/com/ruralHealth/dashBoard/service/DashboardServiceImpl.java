@@ -2,6 +2,7 @@ package com.ruralHealth.dashBoard.service;
 
 import com.ruralHealth.appointment.service.AppointmentServiceImpl;
 import com.ruralHealth.dashBoard.payload.DashboardDto;
+import com.ruralHealth.dashBoard.payload.DashboardSummaryDTO;
 import com.ruralHealth.entity.Appointment;
 import com.ruralHealth.entity.MedicalHistory;
 import com.ruralHealth.entity.Patient;
@@ -9,10 +10,7 @@ import com.ruralHealth.entity.Vaccination;
 import com.ruralHealth.exception.ResourceNotFoundException;
 import com.ruralHealth.medicalHistory.service.MedicalHistoryServiceImpl;
 import com.ruralHealth.patient.payload.PatientDTORequest;
-import com.ruralHealth.repository.AppointmentRepository;
-import com.ruralHealth.repository.MedicalHistoryRepository;
-import com.ruralHealth.repository.PatientRepository;
-import com.ruralHealth.repository.VaccinationRepository;
+import com.ruralHealth.repository.*;
 import com.ruralHealth.vaccination.service.VaccinationServiceImpl;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,8 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Autowired
     private PatientRepository patientRepository;
+    @Autowired
+    private DoctorRepository doctorRepository;
     @Autowired
     private MedicalHistoryRepository medicalHistoryRepository;
     @Autowired
@@ -79,6 +79,20 @@ public class DashboardServiceImpl implements DashboardService {
         response.setCompletedVaccines(vaccinations.size());
 
         return response;
+    }
+
+
+    public DashboardSummaryDTO getDashboardSummary() {
+
+        long totalPatients = patientRepository.count();
+        long totalDoctors = doctorRepository.count();
+        long totalAppointments = appointmentRepository.count();
+
+        return new DashboardSummaryDTO(
+                totalPatients,
+                totalDoctors,
+                totalAppointments
+        );
     }
 
 }
