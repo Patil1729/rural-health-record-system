@@ -1,6 +1,7 @@
 package com.ruralHealth.dashBoard.controller;
 
 import com.ruralHealth.dashBoard.payload.DashboardDto;
+import com.ruralHealth.dashBoard.payload.DashboardSummaryDTO;
 import com.ruralHealth.dashBoard.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,5 +21,15 @@ public class DashBoardRestController {
 
         return ResponseEntity.ok(dashboardService.getDashboard(id));
     }
+
+    @GetMapping("/summary")
+    public ResponseEntity<DashboardSummaryDTO> getSummary() {
+
+        return ResponseEntity.ok(
+                dashboardService.getDashboardSummary()
+        );
+    }
+
+
 }
 
